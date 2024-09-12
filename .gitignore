@@ -1,0 +1,19 @@
+
+```plaintext
+# Go binaries
+/bin/
+/obj/
+
+# Dependency directories
+/vendor/
+
+# Build output
+/build/
+
+# IDEs and editors
+*.idea
+*.vscode
+*.swp
+
+# Environment files
+.env

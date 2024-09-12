@@ -1,0 +1,10 @@
+# Ignore the Go build output
+/build/
+# Ignore vendor directory
+/vendor/
+# Ignore node_modules directory (if you have frontend)
+node_modules/
+# Ignore IDE/editor config files
+.idea
+.vscode
+*.swp
