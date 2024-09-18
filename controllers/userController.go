@@ -9,7 +9,7 @@ import (
 
 func GetUsers(c *gin.Context) {
 	// Gets users
-	users, err := services.GetUser()
+	users, err := services.GetUsers()
 
 	// Return response
 	if err != nil {
@@ -29,9 +29,31 @@ func CreateUser(c *gin.Context) {
 	// Create user
 	// Link here to create user service
 
+	err := services.CreateUser(c)
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{
+			"message": "Error creating new user",
+		})
+	}
+
 	//
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Request successful",
-		"user":    []string{"Jack"},
+		"message": "User Created Successfully",
+	})
+}
+
+func GetUserById(ctx *gin.Context) {
+	userId := ctx.Param("id")
+	user, err := services.GetUserById(userId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error fetching user",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"message": "User fetched successfully",
+		"user":    user,
 	})
 }

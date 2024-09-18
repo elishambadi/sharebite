@@ -16,6 +16,7 @@ func SetupRoutes(r *gin.Engine) {
 	userRoutes := r.Group("/users")
 	{
 		userRoutes.GET("/", controllers.GetUsers)
+		userRoutes.GET("/:id", controllers.GetUserById)
 		userRoutes.POST("/", controllers.CreateUser)
 	}
 }
