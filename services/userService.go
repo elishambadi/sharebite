@@ -1,11 +1,13 @@
 package services
 
 import (
+	"errors"
 	"log"
-	"time"
+	"strconv"
 
 	"github.com/elishambadi/sharebite/db"
 	"github.com/elishambadi/sharebite/models"
+	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,13 +27,17 @@ func GetUsers() ([]models.User, error) {
 }
 
 func CreateUser(ctx *gin.Context) error {
-	newUser := models.User{
-		Name:      "Elisha Mbadi",
-		Email:     "embadi@gmail.com",
-		Password:  "43242342342",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+	var newUser models.User
+
+	if err := ctx.ShouldBindJSON(&newUser); err != nil {
+		return err
 	}
+
+	hashedPw, err := utils.HashPassword(newUser.Password)
+	if err != nil {
+		return err
+	}
+	newUser.Password = hashedPw
 
 	result := db.DB.Create(&newUser)
 	if result.Error != nil {
@@ -41,6 +47,38 @@ func CreateUser(ctx *gin.Context) error {
 		log.Print("User created successfully.")
 		return nil
 	}
+}
+
+func AuthenticateUser(ctx *gin.Context) (string, error) {
+	var user models.User
+
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		return "", err
+	}
+
+	foundUser, err := GetUserByEmail(user.Email)
+	if err != nil {
+		return "", err
+	}
+
+	passwordValid := utils.CheckPassword(foundUser.Password, user.Password)
+	if !passwordValid {
+		return "", errors.New("invalid password")
+	}
+
+	userIdString := strconv.Itoa(int(foundUser.ID))
+
+	token, err := utils.CreateJWT(userIdString, []string{"admin"})
+	if err != nil {
+		return "", err
+	}
+
+	foundUser.APIToken = token
+	db.DB.Save(&foundUser)
+
+	ctx.Set("user", foundUser)
+
+	return token, nil
 }
 
 func GetUserById(id string) (models.User, error) {
@@ -54,4 +92,35 @@ func GetUserById(id string) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	err := db.DB.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		log.Printf("Error getting using with ID %s. Error: %s.\n", email, err)
+		return models.User{}, err
+	} else {
+		log.Printf("User fetched successfully ID %s.\n", email)
+	}
+
+	return user, nil
+}
+
+func DeleteUserById(id string) error {
+	var user models.User
+	user, err := GetUserById(id)
+	if err != nil {
+		return err
+	}
+
+	delResult := db.DB.Delete(&user)
+	if delResult.Error != nil {
+		log.Printf("Error deleting user with ID %s. Error: %s.\n", id, delResult.Error)
+		return delResult.Error
+	} else {
+		log.Printf("User deleted successfully ID %s.\n", id)
+	}
+
+	return nil
 }
