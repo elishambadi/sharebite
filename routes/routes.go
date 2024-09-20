@@ -28,6 +28,9 @@ func SetupRoutes(r *gin.Engine) {
 		protectedRoutes.GET("/dashboard", controllers.Dashboard)
 		protectedRoutes.POST("/donations", controllers.CreateDonation)
 		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImage)
+		protectedRoutes.POST("/donation-requests", controllers.CreateDonationRequest)
+		protectedRoutes.PUT("/donation-requests/:id/status", controllers.UpdateDonationRequestStatus)
+		protectedRoutes.GET("/donation-requests", controllers.ListDonationRequests)
 	}
 
 	r.POST("/signup", controllers.CreateUser)

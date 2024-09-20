@@ -26,4 +26,5 @@ type DonationRequest struct {
 	Status      string    `json:"status"`       // Status of the request (e.g., Pending, Approved, Rejected)
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Donation    Donation
 }
