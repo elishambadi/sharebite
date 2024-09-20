@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/elishambadi/sharebite/db"
@@ -79,6 +80,52 @@ func AuthenticateUser(ctx *gin.Context) (string, error) {
 	ctx.Set("user", foundUser)
 
 	return token, nil
+}
+
+func ResetUserPassword(c *gin.Context) error {
+	var userDetails models.User
+
+	if err := c.ShouldBindJSON(&userDetails); err != nil {
+		return err
+	}
+	log.Printf("Resetting password for %s to %s.", userDetails.Email, userDetails.Password)
+
+	user, err := GetUserByEmail(userDetails.Email)
+	if err != nil {
+		return err
+	}
+
+	newPassword, err := utils.HashPassword(userDetails.Password)
+	if err != nil {
+		return err
+	}
+
+	user.Password = newPassword
+	if err := db.DB.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Gets a user from every authenticated request
+func GetUserFromRequest(c *gin.Context) (models.User, error) {
+	var userModel models.User
+
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "",
+		})
+		return userModel, errors.New("unauthenticated. Please authenticate your request")
+	}
+
+	user, ok := user.(models.User)
+	if !ok {
+		return userModel, errors.New("error retrieving user data")
+	}
+
+	return user.(models.User), nil
 }
 
 func GetUserById(id string) (models.User, error) {

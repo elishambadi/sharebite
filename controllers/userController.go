@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/elishambadi/sharebite/services"
+	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -91,6 +92,7 @@ func AuthenticateUser(ctx *gin.Context) {
 			"message": fmt.Sprintf("Error authenticating: %s", err),
 			"token":   "",
 		})
+		ctx.Abort()
 		return
 	}
 
@@ -98,6 +100,32 @@ func AuthenticateUser(ctx *gin.Context) {
 		"message": "Authenticated Successfully",
 		"token":   token,
 	})
+}
+
+func ResetUserPassword(ctx *gin.Context) {
+	err := services.ResetUserPassword(ctx)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"message": fmt.Sprintf("Error resetting user password: %s", err),
+		})
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Password reset successfully",
+	})
+}
+
+func uploadUserProfile(c *gin.Context) {
+	uploadDir := "./uploads/profile" // Directory to save uploaded files
+	imageURL, err := utils.UploadFile(c, uploadDir)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"image_url": imageURL})
 }
 
 func Dashboard(c *gin.Context) {

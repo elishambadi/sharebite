@@ -10,7 +10,7 @@ import (
 type User struct {
 	gorm.Model
 	Name      string `json:"name"`
-	Email     string `json:"email"`
+	Email     string `json:"email" gorm:"unique; not null"`
 	Password  string `json:"password"`
 	Type      string `json:"type"`
 	CreatedAt time.Time
@@ -22,7 +22,7 @@ type User struct {
 // Performs this check before a user is saved
 func (u *User) BeforeSave(tx *gorm.DB) error {
 	if u.Type != "DONOR" && u.Type != "RECIPIENT" {
-		return errors.New("Invalid type: must either be 'DONOR' or 'RECIPIENT'")
+		return errors.New("invalid type: must either be 'DONOR' or 'RECIPIENT'")
 	}
 	return nil
 }

@@ -16,4 +16,14 @@ type Donation struct {
 	Donor      User      `gorm:"foreignKey:DonorID"`            // The donor, relation to User model
 	CreatedAt  time.Time `json:"created_at"`                    // Timestamp for creation
 	UpdatedAt  time.Time `json:"updated_at"`                    // Timestamp for update
+	ImageURL   string    `json:"image_url"`
+}
+
+type DonationRequest struct {
+	ID          uint      `gorm:"primaryKey"`
+	DonationID  uint      `json:"donation_id"`  // Foreign key to Donation
+	RecipientID uint      `json:"recipient_id"` // Foreign key to User or Recipient
+	Status      string    `json:"status"`       // Status of the request (e.g., Pending, Approved, Rejected)
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

@@ -19,13 +19,15 @@ func SetupRoutes(r *gin.Engine) {
 		userRoutes.GET("/", controllers.GetUsers)
 		userRoutes.GET("/:id", controllers.GetUserById)
 		userRoutes.DELETE("/:id", controllers.DeleteUserById)
+		userRoutes.POST("/reset-password", controllers.ResetUserPassword)
 	}
 
 	protectedRoutes := r.Group("/app")
 	protectedRoutes.Use(middlewares.CheckUserRole)
 	{
 		protectedRoutes.GET("/dashboard", controllers.Dashboard)
-		r.POST("/donations", controllers.CreateDonation)
+		protectedRoutes.POST("/donations", controllers.CreateDonation)
+		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImage)
 	}
 
 	r.POST("/signup", controllers.CreateUser)

@@ -70,5 +70,6 @@ func CheckUserRole(c *gin.Context) {
 
 	// Store user in context if needed
 	c.Set("user", user)
+	log.Println("User set in session: ", user.Email)
 	c.Next()
 }
