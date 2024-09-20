@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -12,6 +13,7 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	DBHost     string
+	GinMode    string
 }
 
 var AppConfig *Config
@@ -27,5 +29,8 @@ func LoadConfig() {
 		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBName:     os.Getenv("DB_NAME"),
 		DBHost:     os.Getenv("DB_HOST"),
+		GinMode:    os.Getenv("GIN_MODE"),
 	}
+
+	gin.SetMode(AppConfig.GinMode)
 }

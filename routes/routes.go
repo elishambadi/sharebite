@@ -25,8 +25,10 @@ func SetupRoutes(r *gin.Engine) {
 	protectedRoutes.Use(middlewares.CheckUserRole)
 	{
 		protectedRoutes.GET("/dashboard", controllers.Dashboard)
+		r.POST("/donations", controllers.CreateDonation)
 	}
 
 	r.POST("/signup", controllers.CreateUser)
 	r.POST("/login", controllers.AuthenticateUser)
+	r.GET("/donations", controllers.ListDonations)
 }
