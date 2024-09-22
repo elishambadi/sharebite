@@ -1,0 +1,8 @@
+GIN_MODE=debug
+
+DB_HOST=localhost
+DB_NAME=sharebite
+DB_USER=postgres
+DB_PASSWORD=12345678
+
+SEED_DB=true
