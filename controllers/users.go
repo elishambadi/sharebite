@@ -12,7 +12,7 @@ import (
 // Interface to be satisfied by any userService
 type UserService interface {
 	GetUsers() ([]models.User, error)
-	CreateUser(ctx *gin.Context) error
+	CreateUser(newUser models.User) error
 	GetUserById(id string) (models.User, error)
 	DeleteUserById(id string) error
 	AuthenticateUser(ctx *gin.Context) (token string, error error)
@@ -43,17 +43,25 @@ func GetUsersHandler(service UserService) gin.HandlerFunc {
 
 func CreateUserHandler(userService UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := userService.CreateUser(c)
+		var newUser models.User
+
+		if err := c.ShouldBindJSON(&newUser); err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("error creating new user: %s", err),
+			})
+		}
+
+		err := userService.CreateUser(newUser)
 		if err != nil {
-			c.AbortWithStatusJSON(500, gin.H{
-				"message": fmt.Sprintf("Error creating new user: %s", err),
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("error creating new user: %s", err),
 			})
 			return
 		}
 
 		//
 		c.JSON(http.StatusCreated, gin.H{
-			"message": "User Created Successfully",
+			"message": "user created successfully",
 		})
 	}
 }
@@ -65,21 +73,23 @@ func GetUserByIdHandler(userService UserService) gin.HandlerFunc {
 		if err != nil {
 			// record not found error
 			if err.Error() == "record not found" {
-				ctx.JSON(http.StatusAccepted, gin.H{
-					"message": "No user found for the given parameters",
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"message": "no user found for the given parameters",
+					"user":    []models.User{},
 				})
 				return
 			}
 
 			// Any other error
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Error fetching user",
+				"message": "error fetching user",
+				"user":    []models.User{},
 			})
 			return
 		}
 
-		ctx.JSON(http.StatusAccepted, gin.H{
-			"message": "User fetched successfully",
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "user fetched successfully",
 			"user":    user,
 		})
 	}

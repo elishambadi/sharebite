@@ -36,13 +36,7 @@ func (u *UserService) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func (u *UserService) CreateUser(ctx *gin.Context) error {
-	var newUser models.User
-
-	if err := ctx.ShouldBindJSON(&newUser); err != nil {
-		return err
-	}
-
+func (u *UserService) CreateUser(newUser models.User) error {
 	hashedPw, err := utils.HashPassword(newUser.Password)
 	if err != nil {
 		return err

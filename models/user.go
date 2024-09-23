@@ -30,8 +30,9 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 }
 
 // Factory method to return a new user
-func NewUser(name, email, password, userType string) User {
+func NewUser(id uint, name, email, password, userType string) User {
 	return User{
+		Model:     gorm.Model{ID: id},
 		Name:      name,
 		Email:     email,
 		Password:  password, // Optionally hash the password here
@@ -42,10 +43,15 @@ func NewUser(name, email, password, userType string) User {
 	}
 }
 
+// Creates two fake users for testing
+//
+// User 1: User(1, "Alice", "alice@example.com", 12345678, "DONOR")
+//
+// User 2: User(2, "Bob", "bob@example.com", 12345678, "RECIPIENT")
 func FakeUsers() []User {
 	hashedPassword, _ := utils.HashPassword("password")
 	return []User{
-		NewUser("Alice", "alice@example.com", hashedPassword, "DONOR"),
-		NewUser("Bob", "bob@example.com", hashedPassword, "RECIPIENT"),
+		NewUser(1, "Alice", "alice@example.com", hashedPassword, "DONOR"),
+		NewUser(2, "Bob", "bob@example.com", hashedPassword, "RECIPIENT"),
 	}
 }
