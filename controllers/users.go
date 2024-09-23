@@ -5,34 +5,18 @@ import (
 	"net/http"
 
 	"github.com/elishambadi/sharebite/models"
-	"github.com/elishambadi/sharebite/services"
 	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
 )
 
-var usersService *services.UserService
-
 // Interface to be satisfied by any userService
 type UserService interface {
 	GetUsers() ([]models.User, error)
-}
-
-func GetUsers1(c *gin.Context) {
-	// Gets users
-	users, err := usersService.GetUsers()
-
-	// Return response
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Error getting Users",
-			"users":   users,
-		})
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Request successful",
-		"users":   users,
-	})
+	CreateUser(ctx *gin.Context) error
+	GetUserById(id string) (models.User, error)
+	DeleteUserById(id string) error
+	AuthenticateUser(ctx *gin.Context) (token string, error error)
+	ResetUserPassword(ctx *gin.Context) error
 }
 
 func GetUsersHandler(service UserService) gin.HandlerFunc {
@@ -43,121 +27,132 @@ func GetUsersHandler(service UserService) gin.HandlerFunc {
 		// Return response
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Error getting Users",
+				"message": "error getting users",
 				"users":   users,
 			})
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Request successful",
+			"message": "request successful",
 			"users":   users,
 		})
 	}
 
 }
 
-func CreateUser(c *gin.Context) {
-	// Create user
-	// Link here to create user service
-
-	err := usersService.CreateUser(c)
-	if err != nil {
-		c.AbortWithStatusJSON(500, gin.H{
-			"message": fmt.Sprintf("Error creating new user: %s", err),
-		})
-		return
-	}
-
-	//
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "User Created Successfully",
-	})
-}
-
-func GetUserById(ctx *gin.Context) {
-	userId := ctx.Param("id")
-	user, err := usersService.GetUserById(userId)
-	if err != nil {
-		// record not found error
-		if err.Error() == "record not found" {
-			ctx.JSON(http.StatusAccepted, gin.H{
-				"message": "No user found for the given parameters",
+func CreateUserHandler(userService UserService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		err := userService.CreateUser(c)
+		if err != nil {
+			c.AbortWithStatusJSON(500, gin.H{
+				"message": fmt.Sprintf("Error creating new user: %s", err),
 			})
 			return
 		}
 
-		// Any other error
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Error fetching user",
+		//
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "User Created Successfully",
 		})
-		return
 	}
-
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"message": "User fetched successfully",
-		"user":    user,
-	})
 }
 
-func DeleteUserById(ctx *gin.Context) {
-	userId := ctx.Param("id")
-	err := usersService.DeleteUserById(userId)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": fmt.Sprintf("Error deleting user: %s", err),
-		})
-		return
-	}
+func GetUserByIdHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId := ctx.Param("id")
+		user, err := userService.GetUserById(userId)
+		if err != nil {
+			// record not found error
+			if err.Error() == "record not found" {
+				ctx.JSON(http.StatusAccepted, gin.H{
+					"message": "No user found for the given parameters",
+				})
+				return
+			}
 
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"message": "User deleted successfully",
-	})
-}
+			// Any other error
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error fetching user",
+			})
+			return
+		}
 
-func AuthenticateUser(ctx *gin.Context) {
-	token, err := usersService.AuthenticateUser(ctx)
-	if err != nil {
 		ctx.JSON(http.StatusAccepted, gin.H{
-			"message": fmt.Sprintf("Error authenticating: %s", err),
-			"token":   "",
+			"message": "User fetched successfully",
+			"user":    user,
 		})
-		ctx.Abort()
-		return
 	}
-
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"message": "Authenticated Successfully",
-		"token":   token,
-	})
 }
 
-func ResetUserPassword(ctx *gin.Context) {
-	err := usersService.ResetUserPassword(ctx)
-	if err != nil {
-		ctx.JSON(500, gin.H{
-			"message": fmt.Sprintf("Error resetting user password: %s", err),
+func DeleteUserByIdHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId := ctx.Param("id")
+		err := userService.DeleteUserById(userId)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("Error deleting user: %s", err),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusAccepted, gin.H{
+			"message": "User deleted successfully",
 		})
-		ctx.Abort()
-		return
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Password reset successfully",
-	})
 }
 
-func uploadUserProfile(c *gin.Context) {
-	uploadDir := "./uploads/profile" // Directory to save uploaded files
-	imageURL, err := utils.UploadFile(c, uploadDir)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+func AuthenticateUserHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token, err := userService.AuthenticateUser(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusAccepted, gin.H{
+				"message": fmt.Sprintf("Error authenticating: %s", err),
+				"token":   "",
+			})
+			ctx.Abort()
+			return
+		}
 
-	c.JSON(http.StatusOK, gin.H{"image_url": imageURL})
+		ctx.JSON(http.StatusAccepted, gin.H{
+			"message": "Authenticated Successfully",
+			"token":   token,
+		})
+	}
 }
 
-func Dashboard(c *gin.Context) {
-	user, _ := c.Get("user")
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome to the dashboard!", "user": user})
+func ResetUserPasswordHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		err := userService.ResetUserPassword(ctx)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"message": fmt.Sprintf("Error resetting user password: %s", err),
+			})
+			ctx.Abort()
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Password reset successfully",
+		})
+	}
+}
+
+func uploadUserProfilePhotoHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		uploadDir := "./uploads/profile" // Directory to save uploaded files
+		imageURL, err := utils.UploadFile(ctx, uploadDir)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"image_url": imageURL})
+	}
+}
+
+func DashboardHandler(userService UserService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		user, _ := ctx.Get("user")
+		ctx.JSON(http.StatusOK, gin.H{"message": "Welcome to the dashboard!", "user": user})
+	}
 }

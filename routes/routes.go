@@ -18,15 +18,15 @@ func SetupRoutes(r *gin.Engine) {
 	userRoutes := r.Group("/users")
 	{
 		userRoutes.GET("/", controllers.GetUsersHandler(&services.UserService{}))
-		userRoutes.GET("/:id", controllers.GetUserById)
-		userRoutes.DELETE("/:id", controllers.DeleteUserById)
-		userRoutes.POST("/reset-password", controllers.ResetUserPassword)
+		userRoutes.GET("/:id", controllers.GetUserByIdHandler(&services.UserService{}))
+		userRoutes.DELETE("/:id", controllers.DeleteUserByIdHandler(&services.UserService{}))
+		userRoutes.POST("/reset-password", controllers.ResetUserPasswordHandler(&services.UserService{}))
 	}
 
 	protectedRoutes := r.Group("/app")
 	protectedRoutes.Use(middlewares.CheckUserRole)
 	{
-		protectedRoutes.GET("/dashboard", controllers.Dashboard)
+		protectedRoutes.GET("/dashboard", controllers.DashboardHandler(&services.UserService{}))
 		protectedRoutes.POST("/donations", controllers.CreateDonation)
 		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImage)
 		protectedRoutes.POST("/donation-requests", controllers.CreateDonationRequest)
@@ -34,7 +34,7 @@ func SetupRoutes(r *gin.Engine) {
 		protectedRoutes.GET("/donation-requests", controllers.ListDonationRequests)
 	}
 
-	r.POST("/signup", controllers.CreateUser)
-	r.POST("/login", controllers.AuthenticateUser)
+	r.POST("/signup", controllers.CreateUserHandler(&services.UserService{}))
+	r.POST("/login", controllers.AuthenticateUserHandler(&services.UserService{}))
 	r.GET("/donations", controllers.ListDonations)
 }
