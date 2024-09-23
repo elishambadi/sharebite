@@ -17,6 +17,7 @@ type UserService interface {
 	DeleteUserById(id string) error
 	AuthenticateUser(ctx *gin.Context) (token string, error error)
 	ResetUserPassword(ctx *gin.Context) error
+	GetUserFromRequest(c *gin.Context) (models.User, error)
 }
 
 func GetUsersHandler(service UserService) gin.HandlerFunc {

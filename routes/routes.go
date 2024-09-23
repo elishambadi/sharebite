@@ -27,14 +27,14 @@ func SetupRoutes(r *gin.Engine) {
 	protectedRoutes.Use(middlewares.CheckUserRole)
 	{
 		protectedRoutes.GET("/dashboard", controllers.DashboardHandler(&services.UserService{}))
-		protectedRoutes.POST("/donations", controllers.CreateDonation)
-		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImage)
-		protectedRoutes.POST("/donation-requests", controllers.CreateDonationRequest)
-		protectedRoutes.PUT("/donation-requests/:id/status", controllers.UpdateDonationRequestStatus)
-		protectedRoutes.GET("/donation-requests", controllers.ListDonationRequests)
+		protectedRoutes.POST("/donations", controllers.CreateDonationHandler(&services.DonationService{}, &services.UserService{}))
+		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImageHandler(&services.DonationService{}))
+		protectedRoutes.POST("/donation-requests", controllers.CreateDonationRequestHandler(&services.DonationService{}, &services.UserService{}))
+		protectedRoutes.PUT("/donation-requests/:id/status", controllers.UpdateDonationRequestStatusHandler(&services.DonationService{}, &services.UserService{}))
+		protectedRoutes.GET("/donation-requests", controllers.ListDonationRequestsHandler(&services.DonationService{}))
 	}
 
 	r.POST("/signup", controllers.CreateUserHandler(&services.UserService{}))
 	r.POST("/login", controllers.AuthenticateUserHandler(&services.UserService{}))
-	r.GET("/donations", controllers.ListDonations)
+	r.GET("/donations", controllers.ListDonationsHandler(&services.DonationService{}))
 }

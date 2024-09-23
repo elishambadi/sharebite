@@ -46,6 +46,11 @@ func (m *MockUserService) ResetUserPassword(ctx *gin.Context) error {
 	return args.Error(1)
 }
 
+func (m *MockUserService) GetUserFromRequest(c *gin.Context) (models.User, error) {
+	args := m.Called()
+	return args.Get(0).(models.User), args.Error(1)
+}
+
 func TestGetUsers(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
