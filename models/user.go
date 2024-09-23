@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/elishambadi/sharebite/utils"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -25,4 +27,25 @@ func (u *User) BeforeSave(tx *gorm.DB) error {
 		return errors.New("invalid type: must either be 'DONOR' or 'RECIPIENT'")
 	}
 	return nil
+}
+
+// Factory method to return a new user
+func NewUser(name, email, password, userType string) User {
+	return User{
+		Name:      name,
+		Email:     email,
+		Password:  password, // Optionally hash the password here
+		Type:      userType,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		APIToken:  uuid.New().String(), // Generate a random token, or use some static value
+	}
+}
+
+func FakeUsers() []User {
+	hashedPassword, _ := utils.HashPassword("password")
+	return []User{
+		NewUser("Alice", "alice@example.com", hashedPassword, "DONOR"),
+		NewUser("Bob", "bob@example.com", hashedPassword, "RECIPIENT"),
+	}
 }

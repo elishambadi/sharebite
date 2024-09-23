@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/elishambadi/sharebite/controllers"
 	"github.com/elishambadi/sharebite/middlewares"
+	"github.com/elishambadi/sharebite/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +17,7 @@ func SetupRoutes(r *gin.Engine) {
 
 	userRoutes := r.Group("/users")
 	{
-		userRoutes.GET("/", controllers.GetUsers)
+		userRoutes.GET("/", controllers.GetUsersHandler(&services.UserService{}))
 		userRoutes.GET("/:id", controllers.GetUserById)
 		userRoutes.DELETE("/:id", controllers.DeleteUserById)
 		userRoutes.POST("/reset-password", controllers.ResetUserPassword)

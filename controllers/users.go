@@ -4,14 +4,22 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/elishambadi/sharebite/models"
 	"github.com/elishambadi/sharebite/services"
 	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
 )
 
-func GetUsers(c *gin.Context) {
+var usersService *services.UserService
+
+// Interface to be satisfied by any userService
+type UserService interface {
+	GetUsers() ([]models.User, error)
+}
+
+func GetUsers1(c *gin.Context) {
 	// Gets users
-	users, err := services.GetUsers()
+	users, err := usersService.GetUsers()
 
 	// Return response
 	if err != nil {
@@ -27,11 +35,32 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
+func GetUsersHandler(service UserService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Gets users
+		users, err := service.GetUsers()
+
+		// Return response
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error getting Users",
+				"users":   users,
+			})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Request successful",
+			"users":   users,
+		})
+	}
+
+}
+
 func CreateUser(c *gin.Context) {
 	// Create user
 	// Link here to create user service
 
-	err := services.CreateUser(c)
+	err := usersService.CreateUser(c)
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{
 			"message": fmt.Sprintf("Error creating new user: %s", err),
@@ -47,7 +76,7 @@ func CreateUser(c *gin.Context) {
 
 func GetUserById(ctx *gin.Context) {
 	userId := ctx.Param("id")
-	user, err := services.GetUserById(userId)
+	user, err := usersService.GetUserById(userId)
 	if err != nil {
 		// record not found error
 		if err.Error() == "record not found" {
@@ -72,7 +101,7 @@ func GetUserById(ctx *gin.Context) {
 
 func DeleteUserById(ctx *gin.Context) {
 	userId := ctx.Param("id")
-	err := services.DeleteUserById(userId)
+	err := usersService.DeleteUserById(userId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": fmt.Sprintf("Error deleting user: %s", err),
@@ -86,7 +115,7 @@ func DeleteUserById(ctx *gin.Context) {
 }
 
 func AuthenticateUser(ctx *gin.Context) {
-	token, err := services.AuthenticateUser(ctx)
+	token, err := usersService.AuthenticateUser(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusAccepted, gin.H{
 			"message": fmt.Sprintf("Error authenticating: %s", err),
@@ -103,7 +132,7 @@ func AuthenticateUser(ctx *gin.Context) {
 }
 
 func ResetUserPassword(ctx *gin.Context) {
-	err := services.ResetUserPassword(ctx)
+	err := usersService.ResetUserPassword(ctx)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"message": fmt.Sprintf("Error resetting user password: %s", err),

@@ -11,9 +11,11 @@ import (
 
 var donationService *services.DonationService
 
+var userService *services.UserService
+
 // CreateDonation handles POST requests to log a new food donation
 func CreateDonation(c *gin.Context) {
-	user, err := services.GetUserFromRequest(c)
+	user, err := userService.GetUserFromRequest(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting user from request",
@@ -73,7 +75,7 @@ func CreateDonationRequest(c *gin.Context) {
 	}
 
 	// Get the user from the request to set DonorID
-	user, err := services.GetUserFromRequest(c)
+	user, err := userService.GetUserFromRequest(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error getting user from request"})
 		return
@@ -117,7 +119,7 @@ func UpdateDonationRequestStatus(c *gin.Context) {
 	}
 
 	// Get the user from the request
-	user, err := services.GetUserFromRequest(c)
+	user, err := userService.GetUserFromRequest(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error getting user from request"})
 		return

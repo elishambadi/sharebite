@@ -10,9 +10,18 @@ import (
 	"github.com/elishambadi/sharebite/models"
 	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func GetUsers() ([]models.User, error) {
+type UserService struct {
+	db *gorm.DB
+}
+
+func NewUserService(db *gorm.DB) *UserService {
+	return &UserService{db: db}
+}
+
+func (u *UserService) GetUsers() ([]models.User, error) {
 	// Gets a user from the DB
 	var users []models.User
 
@@ -27,7 +36,7 @@ func GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func CreateUser(ctx *gin.Context) error {
+func (u *UserService) CreateUser(ctx *gin.Context) error {
 	var newUser models.User
 
 	if err := ctx.ShouldBindJSON(&newUser); err != nil {
@@ -50,14 +59,14 @@ func CreateUser(ctx *gin.Context) error {
 	}
 }
 
-func AuthenticateUser(ctx *gin.Context) (string, error) {
+func (u *UserService) AuthenticateUser(ctx *gin.Context) (string, error) {
 	var user models.User
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		return "", err
 	}
 
-	foundUser, err := GetUserByEmail(user.Email)
+	foundUser, err := u.GetUserByEmail(user.Email)
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +91,7 @@ func AuthenticateUser(ctx *gin.Context) (string, error) {
 	return token, nil
 }
 
-func ResetUserPassword(c *gin.Context) error {
+func (u *UserService) ResetUserPassword(c *gin.Context) error {
 	var userDetails models.User
 
 	if err := c.ShouldBindJSON(&userDetails); err != nil {
@@ -90,7 +99,7 @@ func ResetUserPassword(c *gin.Context) error {
 	}
 	log.Printf("Resetting password for %s to %s.", userDetails.Email, userDetails.Password)
 
-	user, err := GetUserByEmail(userDetails.Email)
+	user, err := u.GetUserByEmail(userDetails.Email)
 	if err != nil {
 		return err
 	}
@@ -109,7 +118,7 @@ func ResetUserPassword(c *gin.Context) error {
 }
 
 // Gets a user from every authenticated request
-func GetUserFromRequest(c *gin.Context) (models.User, error) {
+func (u *UserService) GetUserFromRequest(c *gin.Context) (models.User, error) {
 	var userModel models.User
 
 	user, exists := c.Get("user")
@@ -128,7 +137,7 @@ func GetUserFromRequest(c *gin.Context) (models.User, error) {
 	return user.(models.User), nil
 }
 
-func GetUserById(id string) (models.User, error) {
+func (u *UserService) GetUserById(id string) (models.User, error) {
 	var user models.User
 	result := db.DB.First(&user, id)
 	if result.Error != nil {
@@ -141,7 +150,7 @@ func GetUserById(id string) (models.User, error) {
 	return user, nil
 }
 
-func GetUserByEmail(email string) (models.User, error) {
+func (u *UserService) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	err := db.DB.Where("email = ?", email).First(&user).Error
 	if err != nil {
@@ -154,9 +163,9 @@ func GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-func DeleteUserById(id string) error {
+func (u *UserService) DeleteUserById(id string) error {
 	var user models.User
-	user, err := GetUserById(id)
+	user, err := u.GetUserById(id)
 	if err != nil {
 		return err
 	}
