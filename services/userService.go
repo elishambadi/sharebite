@@ -8,32 +8,21 @@ import (
 
 	"github.com/elishambadi/sharebite/db"
 	"github.com/elishambadi/sharebite/models"
+	repository "github.com/elishambadi/sharebite/repositories"
 	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type UserService struct {
-	db *gorm.DB
+	repo repository.UserRepository
 }
 
-func NewUserService(db *gorm.DB) *UserService {
-	return &UserService{db: db}
+func NewUserService(repo repository.UserRepository) *UserService {
+	return &UserService{repo: repo}
 }
 
 func (u *UserService) GetUsers() ([]models.User, error) {
-	// Gets a user from the DB
-	var users []models.User
-
-	result := db.DB.Find(&users)
-	if result.Error != nil {
-		log.Println("Error fetching users in userService: ", result.Error)
-		return []models.User{}, result.Error
-	} else {
-		log.Println("Users fetched successfully")
-	}
-
-	return users, nil
+	return u.repo.FindAll()
 }
 
 func (u *UserService) CreateUser(newUser models.User) error {
