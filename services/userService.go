@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -11,14 +10,19 @@ import (
 	repository "github.com/elishambadi/sharebite/repositories"
 	"github.com/elishambadi/sharebite/utils"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type UserService struct {
-	repo repository.UserRepository
+	repo   repository.UserRepository
+	logger *zap.Logger
 }
 
-func NewUserService(repo repository.UserRepository) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo repository.UserRepository, logger *zap.Logger) *UserService {
+	return &UserService{
+		repo:   repo,
+		logger: logger,
+	}
 }
 
 func (u *UserService) GetUsers() ([]models.User, error) {
@@ -32,14 +36,7 @@ func (u *UserService) CreateUser(newUser models.User) error {
 	}
 	newUser.Password = hashedPw
 
-	result := db.DB.Create(&newUser)
-	if result.Error != nil {
-		log.Println("Error creating user: ", result.Error)
-		return result.Error
-	} else {
-		log.Print("User created successfully.")
-		return nil
-	}
+	return u.repo.Create(newUser)
 }
 
 func (u *UserService) AuthenticateUser(ctx *gin.Context) (string, error) {
@@ -66,8 +63,9 @@ func (u *UserService) AuthenticateUser(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 
-	foundUser.APIToken = token
-	db.DB.Save(&foundUser)
+	if dbError := u.repo.UpdateAPIToken(foundUser, token); dbError != nil {
+		return "", dbError
+	}
 
 	ctx.Set("user", foundUser)
 
@@ -80,7 +78,8 @@ func (u *UserService) ResetUserPassword(c *gin.Context) error {
 	if err := c.ShouldBindJSON(&userDetails); err != nil {
 		return err
 	}
-	log.Printf("Resetting password for %s to %s.", userDetails.Email, userDetails.Password)
+
+	u.logger.Info("Resetting user password", zap.String("userEmail", userDetails.Email))
 
 	user, err := u.GetUserByEmail(userDetails.Email)
 	if err != nil {
@@ -121,45 +120,13 @@ func (u *UserService) GetUserFromRequest(c *gin.Context) (models.User, error) {
 }
 
 func (u *UserService) GetUserById(id string) (models.User, error) {
-	var user models.User
-	result := db.DB.First(&user, id)
-	if result.Error != nil {
-		log.Printf("Error getting using with ID %s. Error: %s.\n", id, result.Error)
-		return models.User{}, result.Error
-	} else {
-		log.Printf("User fetched successfully ID %s.\n", id)
-	}
-
-	return user, nil
+	return u.repo.GetUserById(id)
 }
 
 func (u *UserService) GetUserByEmail(email string) (models.User, error) {
-	var user models.User
-	err := db.DB.Where("email = ?", email).First(&user).Error
-	if err != nil {
-		log.Printf("Error getting using with ID %s. Error: %s.\n", email, err)
-		return models.User{}, err
-	} else {
-		log.Printf("User fetched successfully ID %s.\n", email)
-	}
-
-	return user, nil
+	return u.repo.GetUserByEmail(email)
 }
 
 func (u *UserService) DeleteUserById(id string) error {
-	var user models.User
-	user, err := u.GetUserById(id)
-	if err != nil {
-		return err
-	}
-
-	delResult := db.DB.Delete(&user)
-	if delResult.Error != nil {
-		log.Printf("Error deleting user with ID %s. Error: %s.\n", id, delResult.Error)
-		return delResult.Error
-	} else {
-		log.Printf("User deleted successfully ID %s.\n", id)
-	}
-
-	return nil
+	return u.repo.DeleteUserById(id)
 }

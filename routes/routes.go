@@ -5,9 +5,13 @@ import (
 	"github.com/elishambadi/sharebite/middlewares"
 	"github.com/elishambadi/sharebite/services"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func SetupRoutes(r *gin.Engine) {
+func SetupRoutes(r *gin.Engine, logger *zap.Logger) {
+	// Add logger to all routes
+	r.Use(middlewares.LoggerMiddleware(logger))
+
 	// use anonymous func to return
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
