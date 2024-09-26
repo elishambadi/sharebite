@@ -20,6 +20,14 @@ type UserService interface {
 	GetUserFromRequest(c *gin.Context) (models.User, error)
 }
 
+// GetUsersHandler godoc
+// @Summary Get all users
+// @Description Get the list of users
+// @Tags users
+// @Produce  json
+// @Success 200 {object} map[string]interface{} "request successful"
+// @Failure 500 {object} map[string]interface{} "error getting users"
+// @Router /users [get]
 func GetUsersHandler(service UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Gets users

@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"log"
+	"strconv"
 
-	"github.com/elishambadi/sharebite/db"
 	"github.com/elishambadi/sharebite/models"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +18,15 @@ type UserRepository interface {
 }
 
 type GormUserRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *zap.Logger
 }
 
-func NewGormUserRepository(db *gorm.DB) *GormUserRepository {
-	return &GormUserRepository{db: db}
+func NewGormUserRepository(db *gorm.DB, logger *zap.Logger) *GormUserRepository {
+	return &GormUserRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 func (r *GormUserRepository) FindAll() ([]models.User, error) {
@@ -38,17 +42,18 @@ func (r *GormUserRepository) FindAll() ([]models.User, error) {
 func (r *GormUserRepository) Create(newUser models.User) error {
 	result := r.db.Create(&newUser)
 	if result.Error != nil {
-		log.Println("Error creating user: ", result.Error)
+		r.logger.Error("Error creating user: ", zap.String("userEmail", newUser.Email), zap.Error(result.Error))
 		return result.Error
 	} else {
-		log.Print("User created successfully.")
+		r.logger.Info("User created successfully", zap.Uint("userId", newUser.ID))
 		return nil
 	}
 }
 
-func (r *GormUserRepository) UpdateAPIToken(user models.User, ApiToken string) error {
+func (r *GormUserRepository) UpdateAPIToken(user *models.User, ApiToken string) error {
 	user.APIToken = ApiToken
 	if err := r.db.Save(&user).Error; err != nil {
+		r.logger.Error("Error updating API key", zap.String("userEmail", user.Email))
 		return err
 	}
 	return nil
@@ -58,23 +63,24 @@ func (r *GormUserRepository) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	err := r.db.Where("email = ?", email).First(&user).Error
 	if err != nil {
-		log.Printf("Error getting using with ID %s. Error: %s.\n", email, err)
+		r.logger.Error("Error getting user by email", zap.String("userEmail", user.Email), zap.Error(err))
 		return models.User{}, err
 	}
 
-	log.Printf("User fetched successfully ID %s.\n", email)
+	r.logger.Info("User fetched via email", zap.String("userEmail", user.Email))
 	return user, nil
 }
 
 func (r *GormUserRepository) GetUserById(id string) (models.User, error) {
 	var user models.User
-	result := db.DB.First(&user, id)
+	idUint, _ := strconv.Atoi(id)
+	result := r.db.Take(&user, idUint)
 	if result.Error != nil {
-		log.Printf("Error getting using with ID %s. Error: %s.\n", id, result.Error)
+		r.logger.Error("Error getting user by ID", zap.String("userId", id), zap.Error(result.Error))
 		return models.User{}, result.Error
 	}
 
-	log.Printf("User fetched successfully ID %s.\n", id)
+	r.logger.Info("User fetched via ID", zap.Uint("userId", user.ID))
 	return user, nil
 }
 
@@ -85,13 +91,12 @@ func (r *GormUserRepository) DeleteUserById(id string) error {
 		return err
 	}
 
-	delResult := db.DB.Delete(&user)
+	delResult := r.db.Delete(&user)
 	if delResult.Error != nil {
-		log.Printf("Error deleting user with ID %s. Error: %s.\n", id, delResult.Error)
+		r.logger.Error("Error deleting user by Id", zap.String("userId", id), zap.Error(delResult.Error))
 		return delResult.Error
-	} else {
-		log.Printf("User deleted successfully ID %s.\n", id)
 	}
 
+	r.logger.Info("User deleted successfully", zap.String("userId", id), zap.String("userEmail", user.Email))
 	return nil
 }

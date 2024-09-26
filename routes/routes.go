@@ -5,6 +5,8 @@ import (
 	"github.com/elishambadi/sharebite/middlewares"
 	"github.com/elishambadi/sharebite/services"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
 
@@ -41,4 +43,5 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger) {
 	r.POST("/signup", controllers.CreateUserHandler(&services.UserService{}))
 	r.POST("/login", controllers.AuthenticateUserHandler(&services.UserService{}))
 	r.GET("/donations", controllers.ListDonationsHandler(&services.DonationService{}))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
