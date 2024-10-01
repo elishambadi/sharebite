@@ -16,4 +16,6 @@ To setup the app:
 
 ToDos:
 - [ ] Complete the Docker Compose file
-- [ ] Deploy NextJS frontend
+- [ ] Deploy Kubes
+- [ ] Finish writing tests
+- [ ] Do OpenAPI docs
