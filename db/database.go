@@ -22,10 +22,24 @@ func ConnectDB() {
 	password := config.AppConfig.DBPassword
 
 	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", host, user, dbName, password)
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Failed to connect to database!", err)
+	var database *gorm.DB
+	var err error
+
+	// Retry mechanism: Try to connect to the database every 5 seconds, up to 5 times
+	for i := 0; i < 5; i++ {
+		database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+		log.Printf("Failed to connect to database. Retrying in 5 seconds... (attempt %d)", i+1)
+		time.Sleep(5 * time.Second)
 	}
+
+	if err != nil {
+		log.Fatal("Failed to connect to database after multiple attempts!", err)
+	}
+
+	log.Println("Successfully connected to the database!")
 
 	database.AutoMigrate(&models.User{}, &models.Donation{}, &models.DonationRequest{}) // Auto-migrate the user model
 

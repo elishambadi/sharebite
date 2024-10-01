@@ -13,6 +13,7 @@ type Config struct {
 	DBHost     string
 	GinMode    string
 	SeedDB     bool
+	AppURL     string
 }
 
 var AppConfig *Config
@@ -30,6 +31,7 @@ func LoadConfig() {
 		DBHost:     os.Getenv("DB_HOST"),
 		GinMode:    os.Getenv("GIN_MODE"),
 		SeedDB:     getSeedDBValue(os.Getenv("SEED_DB")),
+		AppURL:     os.Getenv("APP_URL"),
 	}
 
 	gin.SetMode(AppConfig.GinMode)

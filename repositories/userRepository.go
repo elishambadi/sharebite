@@ -73,7 +73,12 @@ func (r *GormUserRepository) GetUserByEmail(email string) (models.User, error) {
 
 func (r *GormUserRepository) GetUserById(id string) (models.User, error) {
 	var user models.User
-	idUint, _ := strconv.Atoi(id)
+	idUint, err := strconv.Atoi(id)
+	if err != nil {
+		r.logger.Error("Invalid user ID format", zap.String("userId", id), zap.Error(err))
+		return models.User{}, err // return error if ID is not valid
+	}
+
 	result := r.db.Take(&user, idUint)
 	if result.Error != nil {
 		r.logger.Error("Error getting user by ID", zap.String("userId", id), zap.Error(result.Error))

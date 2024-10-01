@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
-    container-name: sharebite-db
+    container_name: sharebite-db
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -12,6 +12,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   app:
     build:
@@ -28,6 +30,12 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

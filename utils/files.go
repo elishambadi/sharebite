@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/elishambadi/sharebite/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +25,9 @@ func UploadFile(c *gin.Context, uploadDir string) (string, error) {
 		return "", err
 	}
 
-	fileURL := "https://example.com/uploads/" + file.Filename
+	APP_URL := config.AppConfig.AppURL
+
+	fileURL := fmt.Sprintf("%s/uploads/", APP_URL) + file.Filename
 
 	return fileURL, nil
 }
