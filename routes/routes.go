@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func SetupRoutes(r *gin.Engine, logger *zap.Logger) {
+func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.UserController) {
 	// Add logger to all routes
 	r.Use(middlewares.LoggerMiddleware(logger))
 
@@ -23,16 +23,16 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger) {
 
 	userRoutes := r.Group("/users")
 	{
-		userRoutes.GET("/", controllers.GetUsersHandler(&services.UserService{}))
-		userRoutes.GET("/:id", controllers.GetUserByIdHandler(&services.UserService{}))
-		userRoutes.DELETE("/:id", controllers.DeleteUserByIdHandler(&services.UserService{}))
-		userRoutes.POST("/reset-password", controllers.ResetUserPasswordHandler(&services.UserService{}))
+		userRoutes.GET("/", userController.GetUsersHandler())
+		userRoutes.GET("/:id", userController.GetUserByIdHandler())
+		userRoutes.DELETE("/:id", userController.DeleteUserByIdHandler())
+		userRoutes.POST("/reset-password", userController.ResetUserPasswordHandler())
 	}
 
 	protectedRoutes := r.Group("/app")
 	protectedRoutes.Use(middlewares.CheckUserRole)
 	{
-		protectedRoutes.GET("/dashboard", controllers.DashboardHandler(&services.UserService{}))
+		protectedRoutes.GET("/dashboard", userController.DashboardHandler())
 		protectedRoutes.POST("/donations", controllers.CreateDonationHandler(&services.DonationService{}, &services.UserService{}))
 		protectedRoutes.POST("/upload-donation-image", controllers.UploadDonationImageHandler(&services.DonationService{}))
 		protectedRoutes.POST("/donation-requests", controllers.CreateDonationRequestHandler(&services.DonationService{}, &services.UserService{}))
@@ -40,8 +40,8 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger) {
 		protectedRoutes.GET("/donation-requests", controllers.ListDonationRequestsHandler(&services.DonationService{}))
 	}
 
-	r.POST("/signup", controllers.CreateUserHandler(&services.UserService{}))
-	r.POST("/login", controllers.AuthenticateUserHandler(&services.UserService{}))
+	r.POST("/signup", userController.CreateUserHandler())
+	r.POST("/login", userController.AuthenticateUserHandler())
 	r.GET("/donations", controllers.ListDonationsHandler(&services.DonationService{}))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

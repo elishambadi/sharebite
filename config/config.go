@@ -1,9 +1,11 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -19,10 +21,10 @@ type Config struct {
 var AppConfig *Config
 
 func LoadConfig() {
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	log.Fatalf("Error loading .env: %s", err)
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env: %s", err)
+	}
 
 	AppConfig = &Config{
 		DBUser:     os.Getenv("DB_USER"),

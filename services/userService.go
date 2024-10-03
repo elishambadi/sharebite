@@ -14,11 +14,11 @@ import (
 )
 
 type UserService struct {
-	repo   repository.UserRepository
+	repo   *repository.GormUserRepository
 	logger *zap.Logger
 }
 
-func NewUserService(repo repository.UserRepository, logger *zap.Logger) *UserService {
+func NewUserService(repo *repository.GormUserRepository, logger *zap.Logger) *UserService {
 	return &UserService{
 		repo:   repo,
 		logger: logger,
@@ -63,7 +63,7 @@ func (u *UserService) AuthenticateUser(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 
-	if dbError := u.repo.UpdateAPIToken(foundUser, token); dbError != nil {
+	if dbError := u.repo.UpdateAPIToken(&foundUser, token); dbError != nil {
 		return "", dbError
 	}
 
