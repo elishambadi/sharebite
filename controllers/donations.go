@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/elishambadi/sharebite/models"
+	"github.com/elishambadi/sharebite/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +20,7 @@ type DonationService interface {
 }
 
 // CreateDonation handles POST requests to log a new food donation
-func CreateDonationHandler(donationService DonationService, userService UserService) gin.HandlerFunc {
+func CreateDonationHandler(donationService DonationService, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, err := userService.GetUserFromRequest(c)
 		if err != nil {
@@ -78,7 +79,7 @@ func UploadDonationImageHandler(donationService DonationService) gin.HandlerFunc
 }
 
 // CreateDonationRequest handles the creation of a donation request
-func CreateDonationRequestHandler(donationService DonationService, userService UserService) gin.HandlerFunc {
+func CreateDonationRequestHandler(donationService DonationService, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request models.DonationRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
@@ -105,7 +106,7 @@ func CreateDonationRequestHandler(donationService DonationService, userService U
 }
 
 // UpdateDonationRequestStatus handles updating the status of a donation request
-func UpdateDonationRequestStatusHandler(donationService DonationService, userService UserService) gin.HandlerFunc {
+func UpdateDonationRequestStatusHandler(donationService DonationService, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := c.Param("id")
 		var input struct {

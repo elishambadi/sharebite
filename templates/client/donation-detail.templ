@@ -1,0 +1,26 @@
+package templates
+
+import "github.com/elishambadi/sharebite/models"
+
+templ DonationDetail(donation models.Donation) {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Donation Detail</title>
+    </head>
+    <body>
+        <header>
+            <h1>Donation Detail</h1>
+        </header>
+        <main>
+            <section>
+                <h2>Donation type: { donation.FoodType }</h2>
+                <p>Details of the donation will be displayed here...</p>
+            </section>
+        </main>
+    </body>
+    </html>
+
+}

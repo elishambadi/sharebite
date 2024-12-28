@@ -25,7 +25,7 @@ func main() {
 	userService := services.NewUserService(userRepo, logger)
 	userController := controllers.NewUserController(*userService)
 
-	routes.SetupRoutes(r, logger, userController)
+	routes.SetupRoutes(r, logger, userController, *userService)
 
 	r.Run(":8080")
 }
