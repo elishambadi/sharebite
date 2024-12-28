@@ -1,28 +1,29 @@
 package templates
 
-templ DonationRequest() {
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Donation Requests</title>
-    </head>
-    <body>
-        <header>
-            <h1>Donation Requests</h1>
-        </header>
-        <main>
-            <section>
-                <h2>List of donation requests</h2>
-                <ul>
-                    <li>Request 1 - Status: Pending</li>
-                    <li>Request 2 - Status: Approved</li>
-                    <li>Request 3 - Status: Completed</li>
-                </ul>
-            </section>
-        </main>
-    </body>
-    </html>
+templ DonationRequests() {
+    <!-- DonationRequests.templ -->
+
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-6">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800">Donation Requests</h1>
+
+        <section class="space-y-4">
+            <h2 class="text-2xl font-semibold text-blue-600">List of Donation Requests</h2>
+            
+            <ul class="space-y-3">
+                <li class="flex justify-between p-4 bg-gray-100 rounded-lg shadow-sm">
+                    <span class="text-lg text-gray-800">Request 1</span>
+                    <span class="text-sm text-yellow-500 font-semibold">Pending</span>
+                </li>
+                <li class="flex justify-between p-4 bg-green-100 rounded-lg shadow-sm">
+                    <span class="text-lg text-gray-800">Request 2</span>
+                    <span class="text-sm text-green-500 font-semibold">Approved</span>
+                </li>
+                <li class="flex justify-between p-4 bg-blue-100 rounded-lg shadow-sm">
+                    <span class="text-lg text-gray-800">Request 3</span>
+                    <span class="text-sm text-blue-500 font-semibold">Completed</span>
+                </li>
+            </ul>
+        </section>
+    </div>
 
 }

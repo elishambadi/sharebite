@@ -29,6 +29,14 @@ func (dr *DonationRepository) FindAll() ([]models.Donation, error) {
 	return donations, nil
 }
 
+func (dr *DonationRepository) FindDonation(donationID string) (*models.Donation, error) {
+	var donation models.Donation
+	if err := dr.db.First(&donation, donationID).Error; err != nil {
+		return nil, err
+	}
+	return &donation, nil
+}
+
 func (dr *DonationRepository) CreateDonation(donation *models.Donation) error {
 	return dr.db.Create(&donation).Error
 }

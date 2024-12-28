@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"fmt"
 	"math/rand"
 
 	"gorm.io/gorm"
@@ -60,12 +61,46 @@ func NewDonationRequest(id uint, donationID uint, recipientID uint, status strin
 	}
 }
 
-// GenerateFakeDonations creates 3 fake donations using NewDonation
+// GenerateFakeDonations creates 50 fake donations with randomization
 func GenerateFakeDonations() []Donation {
-	donations := []Donation{
-		NewDonation(1, "Canned Beans", 50, time.Now().AddDate(0, 3, 0), "123 Charity St", "High", 1, "https://example.com/images/donation1.jpg"),
-		NewDonation(2, "Fresh Bread", 20, time.Now().AddDate(0, 0, 3), "456 Community Rd", "Medium", 2, "https://example.com/images/donation2.jpg"),
-		NewDonation(3, "Rice", 100, time.Now().AddDate(0, 6, 0), "789 Shelter Ln", "Low", 1, "https://example.com/images/donation3.jpg"),
+	// Initialize random seed
+	rand.Seed(time.Now().UnixNano())
+
+	// Data for randomization
+	foodTypes := []string{"Canned Beans", "Fresh Bread", "Rice", "Pasta", "Canned Soup", "Fresh Vegetables", "Milk", "Canned Tuna", "Cereal", "Frozen Meat"}
+	locations := []string{"123 Charity St", "456 Community Rd", "789 Shelter Ln", "101 Main St", "202 Oak Ave", "303 Pine Blvd", "404 Maple Dr", "505 Birch Rd", "606 Cedar St", "707 Elm St"}
+	urgencies := []string{"Low", "Medium", "High"}
+
+	var donations []Donation
+
+	var i uint
+
+	for i = 1; i <= 50; i++ {
+		foodType := foodTypes[rand.Intn(len(foodTypes))]                  // Random food type
+		location := locations[rand.Intn(len(locations))]                  // Random location
+		urgency := urgencies[rand.Intn(len(urgencies))]                   // Random urgency level
+		quantity := rand.Intn(101) + 10                                   // Random quantity between 10 and 110
+		expiration := time.Now().AddDate(0, rand.Intn(12), rand.Intn(30)) // Random expiration date within 1 year
+
+		// Random donor ID (1 to 5)
+		donorID := uint(rand.Intn(2) + 1)
+
+		// Image URL based on the donation ID
+		imageURL := fmt.Sprintf("https://example.com/images/donation%d.jpg", i)
+
+		// Create a fake donation
+		donation := NewDonation(
+			i,          // ID
+			foodType,   // FoodType
+			quantity,   // Quantity
+			expiration, // Expiration date
+			location,   // Location
+			urgency,    // Urgency
+			donorID,    // DonorID
+			imageURL,   // Image URL
+		)
+
+		donations = append(donations, donation)
 	}
 
 	return donations

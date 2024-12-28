@@ -54,7 +54,8 @@ func seedDB() {
 	hashedPassword, _ := utils.HashPassword("password")
 	users := []models.User{
 		{Name: "Alice", Email: "alice@example.com", Password: hashedPassword, Type: "DONOR", APIToken: "token1"},
-		{Name: "Bob", Email: "bob@example.com", Password: hashedPassword, Type: "RECIPIENT", APIToken: "token2"},
+		{Name: "Bob", Email: "bob@example.com", Password: hashedPassword, Type: "DONOR", APIToken: "token2"},
+		{Name: "Teddy", Email: "ted@example.com", Password: hashedPassword, Type: "DONOR", APIToken: "token3"},
 	}
 
 	for idx, user := range users {
@@ -65,26 +66,7 @@ func seedDB() {
 	}
 
 	// Seed donations
-	donations := []models.Donation{
-		{
-			FoodType:   "Vegetables",
-			Quantity:   10,
-			Expiration: time.Now().AddDate(0, 1, 0),
-			Location:   "Warehouse A",
-			Urgency:    "Low",
-			DonorID:    users[0].ID, // Use Alice's ID
-			ImageURL:   "http://example.com/image1.jpg",
-		},
-		{
-			FoodType:   "Canned Beans",
-			Quantity:   20,
-			Expiration: time.Now().AddDate(0, 0, 15),
-			Location:   "Warehouse B",
-			Urgency:    "High",
-			DonorID:    users[0].ID, // Use Alice's ID
-			ImageURL:   "http://example.com/image2.jpg",
-		},
-	}
+	donations := models.GenerateFakeDonations()
 
 	for idx, donation := range donations {
 		if err := DB.Create(&donation).Error; err != nil {

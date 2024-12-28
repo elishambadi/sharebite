@@ -19,6 +19,10 @@ func (s *DonationService) CreateDonation(donation *models.Donation) error {
 	return s.repo.CreateDonation(donation)
 }
 
+func (s *DonationService) GetDonationByID(id string) (*models.Donation, error) {
+	return s.repo.FindDonation(id)
+}
+
 // ListDonations retrieves all donations with donor details
 func (s *DonationService) ListDonations() ([]models.Donation, error) {
 	return s.repo.FindAll()

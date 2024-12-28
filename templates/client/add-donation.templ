@@ -1,28 +1,16 @@
 package templates
 
 templ AddDonation() {
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Donation</title>
-    </head>
-    <body>
-        <header>
-            <h1>Create a New Donation</h1>
-        </header>
-        <main>
-            <section>
-                <form action="/donations" method="POST">
-                    <label for="amount">Amount:</label>
-                    <input type="number" id="amount" name="amount" required>
-                    <label for="recipient">Recipient:</label>
-                    <input type="text" id="recipient" name="recipient" required>
-                    <button type="submit">Donate</button>
-                </form>
-            </section>
-        </main>
-    </body>
-    </html>
+        <h1>Create a New Donation</h1>
+    
+        <section>
+            <form action="/donations" method="POST">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" required>
+                <label for="recipient">Recipient:</label>
+                <input type="text" id="recipient" name="recipient" required>
+                <button type="submit">Donate</button>
+            </form>
+        </section>
+
 }

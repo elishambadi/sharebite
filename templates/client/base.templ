@@ -1,0 +1,66 @@
+package templates
+
+templ Base(PageTitle string, bodyComponent templ.Component) {
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{ PageTitle }</title>
+
+        <!-- Tailwind CSS - You can link to your own file or CDN -->
+        <link href="https://cdn.tailwindcss.com/3.4.16" rel="stylesheet">
+        <link href="/assets/styles/main.min.css" rel="stylesheet">
+        
+        <!-- HTMX - For dynamic content loading -->
+        <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+
+        <!-- You can add more external stylesheets here if needed -->
+    </head>
+    <body class="font-sans bg-gray-100">
+
+        <!-- Header Section with Navbar -->
+        <header class="bg-indigo-600 text-slate-900 shadow-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+                <div class="relative flex items-center justify-between h-16">
+                    <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-slate-900 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
+                        <a href="/app/dashboard" hx-boost="true" class="text-2xl font-bold text-slate-900">
+                            Sharebite
+                        </a>
+                    </div>
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="/app/profile" hx-boost="true" class="text-slate-900 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+                        <a href="/app/donations" hx-boost="true" class="ml-4 text-slate-900 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Donations</a>
+                        <a href="/app/donation-requests" hx-boost="true" class="ml-4 text-slate-900 hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">Requests</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content (Body) Placeholder -->
+        <main class="min-h-screen bg-gray-50 py-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <!-- The page component content will be inserted here -->
+                @bodyComponent
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="bg-indigo-600 text-white py-4">
+            <div class="max-w-7xl mx-auto text-center">
+                <p>&copy; 2024 Sharebite. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+    </body>
+    </html>
+
+}

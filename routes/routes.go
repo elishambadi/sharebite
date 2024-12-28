@@ -7,7 +7,7 @@ import (
 	"github.com/elishambadi/sharebite/controllers"
 	"github.com/elishambadi/sharebite/middlewares"
 	"github.com/elishambadi/sharebite/services"
-	"github.com/elishambadi/sharebite/templates"
+	templates "github.com/elishambadi/sharebite/templates/client"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -20,7 +20,7 @@ func render(c *gin.Context, status int, template templ.Component) error {
 	return template.Render(c.Request.Context(), c.Writer)
 }
 
-func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.UserController, userService services.UserService) {
+func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.UserController, userService services.UserService, donationService services.DonationService) {
 	// Add logger to all routes
 	r.Use(middlewares.LoggerMiddleware(logger))
 
@@ -45,46 +45,54 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.U
 		}
 
 		apiRoutes.GET("/dashboard", userController.DashboardHandler())
-		apiRoutes.POST("/donations", controllers.CreateDonationHandler(&services.DonationService{}, userService))
-		apiRoutes.POST("/upload-donation-image", controllers.UploadDonationImageHandler(&services.DonationService{}))
-		apiRoutes.POST("/donation-requests", controllers.CreateDonationRequestHandler(&services.DonationService{}, userService))
-		apiRoutes.PUT("/donation-requests/:id/status", controllers.UpdateDonationRequestStatusHandler(&services.DonationService{}, userService))
-		apiRoutes.GET("/donation-requests", controllers.ListDonationRequestsHandler(&services.DonationService{}))
+		apiRoutes.POST("/donations", controllers.CreateDonationHandler(&donationService, userService))
+		apiRoutes.POST("/upload-donation-image", controllers.UploadDonationImageHandler(&donationService))
+		apiRoutes.POST("/donation-requests", controllers.CreateDonationRequestHandler(&donationService, userService))
+		apiRoutes.PUT("/donation-requests/:id/status", controllers.UpdateDonationRequestStatusHandler(&donationService, userService))
+		apiRoutes.GET("/donation-requests", controllers.ListDonationRequestsHandler(&donationService))
 
 		apiRoutes.POST("/signup", userController.CreateUserHandler())
 		apiRoutes.POST("/login", userController.AuthenticateUserHandler())
-		apiRoutes.GET("/donations", controllers.ListDonationsHandler(&services.DonationService{}))
+		apiRoutes.GET("/donations", controllers.ListDonationsHandler(&donationService))
 		apiRoutes.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// App Routes (Frontend-specific)
 	appRoutes := r.Group("/app")
-	appRoutes.Use(middlewares.CheckUserRole)
+	appRoutes.Use()
 	{
 		// Dashboard
 		appRoutes.GET("/dashboard", func(c *gin.Context) {
-			render(c, http.StatusOK, templates.Base(templates.Dashboard()))
+			render(c, http.StatusOK, templates.Base("Dashboard", templates.Dashboard()))
 		})
 
 		// Create a new donation
 		appRoutes.GET("/donations/new", func(c *gin.Context) {
-			render(c, http.StatusOK, templates.Base(templates.NewDonation()))
+			render(c, http.StatusOK, templates.Base("Give a Donation", templates.AddDonation()))
+		})
+
+		// Create a new donation
+		appRoutes.GET("/donations", func(c *gin.Context) {
+			donations, _ := donationService.ListDonations()
+			render(c, http.StatusOK, templates.Base("Donations", templates.DonationsList(donations)))
 		})
 
 		// View donation details
 		appRoutes.GET("/donations/:id", func(c *gin.Context) {
 			donationID := c.Param("id")
-			render(c, http.StatusOK, templates.Base(templates.DonationDetail(donationID)))
+			donation, _ := donationService.GetDonationByID(donationID)
+
+			render(c, http.StatusOK, templates.Base("View Donation", templates.DonationDetail(*donation)))
 		})
 
 		// List donation requests
 		appRoutes.GET("/donation-requests", func(c *gin.Context) {
-			render(c, http.StatusOK, templates.Base(templates.DonationRequests()))
+			render(c, http.StatusOK, templates.Base("Donation Requests", templates.DonationRequests()))
 		})
 
 		// User profile
 		appRoutes.GET("/profile", func(c *gin.Context) {
-			render(c, http.StatusOK, templates.Base(templates.Profile()))
+			render(c, http.StatusOK, templates.Base("My profile", templates.Profile()))
 		})
 	}
 }

@@ -25,7 +25,10 @@ func main() {
 	userService := services.NewUserService(userRepo, logger)
 	userController := controllers.NewUserController(*userService)
 
-	routes.SetupRoutes(r, logger, userController, *userService)
+	donationRepo := repository.NewDonationRepository(db.DB)
+	donationService := services.NewDonationService(*donationRepo)
+
+	routes.SetupRoutes(r, logger, userController, *userService, *donationService)
 
 	r.Run(":8080")
 }

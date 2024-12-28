@@ -1,26 +1,32 @@
 package templates
 
 templ Profile() {
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Profile</title>
-    </head>
-    <body>
-        <header>
-            <h1>Your Profile</h1>
-        </header>
-        <main>
-            <section>
-                <h2>Profile Information</h2>
-                <p>Name: John Doe</p>
-                <p>Email: johndoe@example.com</p>
-                <p>More user details go here...</p>
-            </section>
-        </main>
-    </body>
-    </html>
+    <!-- Profile.templ -->
+
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-8">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800">Your Profile</h1>
+
+        <section class="space-y-6">
+            <h2 class="text-2xl font-semibold text-blue-600">Profile Information</h2>
+
+            <div class="space-y-4">
+                <p class="text-lg text-gray-700">
+                    <span class="font-semibold">Name:</span> John Doe
+                </p>
+                <p class="text-lg text-gray-700">
+                    <span class="font-semibold">Email:</span> johndoe@example.com
+                </p>
+                <p class="text-lg text-gray-700">
+                    <span class="font-semibold">More user details go here...</span>
+                </p>
+            </div>
+        </section>
+
+        <div class="flex justify-center">
+            <button class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Edit Profile
+            </button>
+        </div>
+    </div>
 
 }

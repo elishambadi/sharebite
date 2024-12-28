@@ -17,6 +17,7 @@ type DonationService interface {
 	UpdateDonationRequestStatus(id string, status string) error
 	ListDonationRequests() ([]models.DonationRequest, error)
 	GetDonationRequestByID(requestID string) (*models.DonationRequest, error)
+	GetDonationByID(donationID string) (*models.Donation, error)
 }
 
 // CreateDonation handles POST requests to log a new food donation
@@ -60,6 +61,28 @@ func ListDonationsHandler(donationService DonationService) gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message":   "Donations retrieved successfully",
 			"donations": donations,
+		})
+	}
+}
+
+// GetDonationByID handles GET requests to retrieve a donation by its ID
+func GetDonationByIDHandler(donationService DonationService) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Extract donation ID from the URL parameter
+		donationID := ctx.Param("id")
+
+		// Call the service to get the donation by ID
+		donation, err := donationService.GetDonationByID(donationID)
+		if err != nil {
+			// If the donation is not found or an error occurs, return an error response
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Donation not found"})
+			return
+		}
+
+		// If successful, return the donation details in the response
+		ctx.JSON(http.StatusOK, gin.H{
+			"message":  "Donation retrieved successfully",
+			"donation": donation,
 		})
 	}
 }
