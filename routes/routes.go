@@ -28,9 +28,7 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.U
 
 	// Root route
 	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "Welcome to ShareBite API!",
-		})
+		render(ctx, http.StatusOK, templates.Base("Dashboard", templates.Dashboard()))
 	})
 
 	// API Routes
