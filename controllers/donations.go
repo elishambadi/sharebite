@@ -26,7 +26,7 @@ func CreateDonationHandler(donationService DonationService, userService services
 		user, err := userService.GetUserFromRequest(c)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": "Error getting user from request",
+				"message": "Error getting user. Please login.",
 			})
 			c.Abort()
 			return

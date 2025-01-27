@@ -1,16 +1,98 @@
 package templates
 
 templ AddDonation() {
-        <h1>Create a New Donation</h1>
-    
-        <section>
-            <form action="/donations" method="POST">
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" name="amount" required>
-                <label for="recipient">Recipient:</label>
-                <input type="text" id="recipient" name="recipient" required>
-                <button type="submit">Donate</button>
-            </form>
+        <h1 class="text-2xl font-bold mb-4">Create a New Donation</h1>
+
+        <section class="p-4 bg-gray-100 rounded-lg shadow-md">
+        <form action="/api/donations" method="POST" class="space-y-4">
+            <!-- Food Type -->
+            <div>
+            <label for="food_type" class="block text-sm font-medium text-gray-700">Food Type:</label>
+            <input
+                type="text"
+                id="food_type"
+                name="food_type"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., Fruits, Vegetables"
+                required
+            />
+            </div>
+
+            <!-- Quantity -->
+            <div>
+            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity:</label>
+            <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., 10"
+                required
+            />
+            </div>
+
+            <!-- Expiration Date -->
+            <div>
+            <label for="expiration" class="block text-sm font-medium text-gray-700">Expiration Date:</label>
+            <input
+                type="date"
+                id="expiration"
+                name="expiration"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required
+            />
+            </div>
+
+            <!-- Location -->
+            <div>
+            <label for="location" class="block text-sm font-medium text-gray-700">Location:</label>
+            <input
+                type="text"
+                id="location"
+                name="location"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., City, Address"
+                required
+            />
+            </div>
+
+            <!-- Urgency -->
+            <div>
+            <label for="urgency" class="block text-sm font-medium text-gray-700">Urgency:</label>
+            <select
+                id="urgency"
+                name="urgency"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            >
+                <option value="">Select Urgency</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            </div>
+
+            <!-- Image URL -->
+            <div>
+            <label for="image_url" class="block text-sm font-medium text-gray-700">Image URL (optional):</label>
+            <input
+                type="url"
+                id="image_url"
+                name="image_url"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="https://example.com/image.jpg"
+            />
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+            <button
+                type="submit"
+                class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+                Donate
+            </button>
+            </div>
+        </form>
         </section>
 
 }

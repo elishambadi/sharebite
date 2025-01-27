@@ -59,6 +59,14 @@ func SetupRoutes(r *gin.Engine, logger *zap.Logger, userController controllers.U
 	appRoutes := r.Group("/app")
 	appRoutes.Use()
 	{
+		appRoutes.GET("/signup", func(c *gin.Context) {
+			render(c, http.StatusOK, templates.Base("SignUp", templates.SignUp()))
+		})
+
+		appRoutes.GET("/login", func(c *gin.Context) {
+			render(c, http.StatusOK, templates.Base("Login", templates.Login()))
+		})
+
 		// Dashboard
 		appRoutes.GET("/dashboard", func(c *gin.Context) {
 			render(c, http.StatusOK, templates.Base("Dashboard", templates.Dashboard()))

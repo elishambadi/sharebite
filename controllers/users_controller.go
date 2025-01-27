@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/elishambadi/sharebite/models"
@@ -63,13 +65,24 @@ func (c *userController) GetUsersHandler() gin.HandlerFunc {
 
 func (c *userController) CreateUserHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		fmt.Printf("Headers: %+v\n", ctx.Request.Header)
+
+		// Read and print the raw request body
+		body, _ := io.ReadAll(ctx.Request.Body)
+		fmt.Printf("Raw Request Body: %s\n", body)
+
+		// Restore the request body
+		ctx.Request.Body = io.NopCloser(bytes.NewReader(body))
+
 		var newUser models.User
 
-		if err := ctx.ShouldBindJSON(&newUser); err != nil {
+		if err := ctx.ShouldBind(&newUser); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": fmt.Sprintf("error creating new user: %s", err),
+				"message": fmt.Sprintf("error binding form data: %s", err),
 			})
 		}
+
+		fmt.Printf("Received form data: %+v\n", newUser)
 
 		err := c.userService.CreateUser(newUser)
 		if err != nil {

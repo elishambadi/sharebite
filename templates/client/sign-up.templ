@@ -1,0 +1,88 @@
+package templates
+
+templ SignUp() {
+    <h1 class="text-2xl font-bold mb-4">Signup</h1>
+
+    <section class="p-4 bg-gray-100 rounded-lg shadow-md">
+    <form
+        hx-post="/api/signup"
+        hx-trigger="submit"
+        hx-headers='{"Content-Type": "application/json"}'
+        hx-vals='{"name": document.getElementById("name").value, 
+                    "email": document.getElementById("email").value, 
+                    "password": document.getElementById("password").value, 
+                    "type": document.getElementById("type").value}'
+        hx-target="#signup-message"
+        hx-swap="innerHTML"
+        >
+
+        <!-- Name -->
+        <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
+        <input
+            type="text"
+            id="name"
+            name="Name"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your name"
+            required
+        />
+        </div>
+
+        <!-- Email -->
+        <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+        <input
+            type="email"
+            id="email"
+            name="Email"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your email"
+            required
+        />
+        </div>
+
+        <!-- Password -->
+        <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password:</label>
+        <input
+            type="password"
+            id="password"
+            name="Password"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Create a password"
+            required
+        />
+        </div>
+
+        <!-- User Type -->
+        <div>
+        <label for="type" class="block text-sm font-medium text-gray-700">User Type:</label>
+        <select
+            id="type"
+            name="Type"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            required
+        >
+            <option value="">Select user type</option>
+            <option value="DONOR">Donor</option>
+            <option value="RECIPIENT">Recipient</option>
+        </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+        <button
+            type="submit"
+            class="w-full bg-blue-500 py-2 px-4 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+            Signup
+        </button>
+        </div>
+    </form>
+
+    <div id="signup-message" class="mt-4 text-sm text-gray-700"></div>
+
+    </section>
+
+}
